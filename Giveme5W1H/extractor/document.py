@@ -1,3 +1,6 @@
+from Giveme5W1H.extractor.candidate import Candidate
+
+
 class Document(object):
     """
     Document is a pickable container for the raw document and all related data
@@ -148,7 +151,8 @@ class Document(object):
             return self._answers
 
     def get_top_answer(self, question):
-        return self.get_answers(question=question)[0]
+        result = self.get_answers(question=question)
+        return Candidate() if len(result) == 0 else result[0]
 
     def get_annotations(self):
         return self._annotations
@@ -260,4 +264,3 @@ class Document(object):
         :return:
         """
         return self._error_flags
-
