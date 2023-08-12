@@ -143,6 +143,7 @@ def extract():
     else:
         return "Record not found", 400
 
+
 @app.route('/extract-doubled', methods=['GET'])
 def extract_doubled():
     return get_mainPageDoubled()
@@ -202,12 +203,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # setup config
-    # Config.get()["candidate"]["nlpIndexSentence"] = False
-    # Config.get()["candidate"]["part"]['nlpTag'] = False
-    # Config.get()["candidate"]["score"] = False
-    # Config.get()["label"] = False
-    # Config.get()["onlyTopCandidate"] = True
-
-    # startup
     main()

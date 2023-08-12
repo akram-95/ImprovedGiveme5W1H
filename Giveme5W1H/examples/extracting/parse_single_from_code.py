@@ -2,6 +2,7 @@ import logging
 
 from Giveme5W1H.extractor.document import Document
 from Giveme5W1H.extractor.extractor import MasterExtractor
+from Giveme5W1H.extractor.named_entity_recognition import NamedEntityRecognition
 
 """
 This is a simple example how to use the extractor in combination with a dict in news-please format.
@@ -78,6 +79,7 @@ if __name__ == '__main__':
     doc = Document.from_text(titleshort, date_publish)
 
     doc = extractor.parse(doc)
+    print(extractor.namedEntityRecognition.getLocation_raw())
 
     top_who_answer = doc.get_top_answer('who').get_parts_as_text()
     top_what_answer = doc.get_top_answer('what').get_parts_as_text()
