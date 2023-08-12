@@ -40,34 +40,28 @@ debug = False
 
 # Template engine
 env = Environment(
-    loader=PackageLoader('Giveme5W1H.examples', 'Giveme5W1H.extracting'),
+    loader=PackageLoader('Giveme5W1H.examples', 'extracting'),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
 template_index = env.from_string(open(os.path.join(os.path.dirname(__file__), 'index.html')).read())
-
-# Giveme5W setup
+template_index_doubled = env.from_string(open(os.path.join(os.path.dirname(__file__), 'index_doubled.html')).read())
 extractor = MasterExtractor()
-
-# extractor_enhancer = MasterExtractor( enhancement=[
-#    Heideltime(['when']),
-#    Aida(['how','when','why','where','what','who'])
-# ])
 reader = Reader()
 writer = Writer()
 
 
-def get_mainPage():
+def get_mainpage():
     return template_index.render()
 
 
-# define route for parsing requests
 @app.route('/', methods=['GET'])
 def root():
-    return get_mainPage()
+    return get_mainpage()
 
 
 def request_to_document():
+    document = None
     if request.method == 'POST':
         data = request.get_json(force=True)
         document = reader.parse_newsplease(data, 'Server')
@@ -93,24 +87,111 @@ def request_to_document():
     return document
 
 
-# define route for parsing requests
-@app.route('/extract', methods=['GET', 'POST'])
+def request_to_document_doubled():
+    document = None
+    if request.method == 'POST':
+        body = request.get_json()
+        data = body["data"]
+        date = body["publish_date"]
+
+        if data:
+            document = Document(data, data, '', date=date)
+        else:
+            log.error("Retrieved data does not contain data. it is required.")
+            return None
+    return document
+
+
+@app.route('/extract', methods=['POST'])
 def extract():
     document = request_to_document()
     if document:
-        extractor.parse(document)
-        answer = writer.generate_json(document)
-        return jsonify(answer)
+        document = extractor.parse(document)
+        top_who = ''
+        top_why = ''
+        top_what = ''
+        top_where = ''
+        top_when = ''
+        top_how = ''
+        try:
+            top_who = document.get_top_answer('who').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_why = document.get_top_answer('why').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_what = document.get_top_answer('what').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_where = document.get_top_answer('where').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_when = document.get_top_answer('when').get_parts_as_text()
+        except:
+            pass
+
+        try:
+            top_how = document.get_top_answer('how').get_parts_as_text()
+        except:
+            pass
+
+        return {'who': top_who, 'where': top_where, 'why': top_why, 'when': top_when, 'what': top_what, 'how': top_how}
+    else:
+        return "Record not found", 400
+
+@app.route('/extract-doubled', methods=['GET'])
+def extract_doubled():
+    return get_mainPageDoubled()
 
 
-# define route for parsing requests
-# @app.route('/extractEnhancer', methods=['GET', 'POST'])
-# def extractEnhancer():
-#    document = request_to_document()
-#    if document:
-#        #extractor_enhancer.parse(document)
-#        answer = writer.generate_json(document)
-#        return jsonify(answer)
+def get_mainPageDoubled():
+    return template_index_doubled.render()
+
+
+@app.route('/extract-doubled', methods=['POST'])
+def extract_doubled_post():
+    document = request_to_document_doubled()
+    if document:
+        document = extractor.parse(document)
+        top_who = ''
+        top_why = ''
+        top_what = ''
+        top_where = ''
+        top_when = ''
+        top_how = ''
+        try:
+            top_who = document.get_top_answer('who').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_why = document.get_top_answer('why').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_what = document.get_top_answer('what').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_where = document.get_top_answer('where').get_parts_as_text()
+        except:
+            pass
+        try:
+            top_when = document.get_top_answer('when').get_parts_as_text()
+        except:
+            pass
+
+        try:
+            top_how = document.get_top_answer('how').get_parts_as_text()
+        except:
+            pass
+
+        return {'who': top_who, 'where': top_where, 'why': top_why, 'when': top_when, 'what': top_what, 'how': top_how}
+    else:
+        return "Record not found", 400
 
 
 def main():

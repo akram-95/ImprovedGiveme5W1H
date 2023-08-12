@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            margin-left: auto;
+            margin-right: auto;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <title>Title</title>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+
+        function doRequest(service) {
+            // wild parsing makes sure it ahs the right format
+            const input = JSON.stringify(JSON.parse($("#post").val()));
+            var x = document.getElementById("loader");
+            x.style.display = "block";
+
+            $.ajax({
+                type: "POST",
+                url: '/' + service,
+                data: input,
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    x.style.display = "none";
+                    pretty = JSON.stringify(data, undefined, 4)
+                    $("#result").html(pretty);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    x.style.display = "none";
+                    alert("Error: " + errorThrown + " Status: " + textStatus);
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+<h1>POST</h1>
+<p>For POST, use the news-please format</p>
+<p>
+    <button type="button" onclick="doRequest('extract-doubled')">run example</button>
+</p>
+<!-- <p><button type="button" onclick="doRequest('extractEnhancer')">run example Enhancer</button></p>
+-->
+
+<div class="loader" id="loader" hidden style="text-align:center"></div>
+<p></p>
+<textarea id="post" rows="40" style="width: 100%;">
+    {
+      "publish_date": "2023-08-11 14:44:34",
+      "data": "New border security laws in Texas will allow floating barriers to prevent drug and arms smugglers and migrants from crossing the Rio Grande River on the Mexican border"
+    }
+
+    </textarea>
+<textarea id="result" rows="40" style="width: 100%;">
+
+</textarea>
+
+</body>
+</html>

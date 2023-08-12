@@ -20,19 +20,13 @@ class Preprocessor:
         # connect to CoreNLP server
         host = "http://localhost:9000" if host is None else host
         self.cnlp = CoreNLPClient(endpoint=host,
-                                  start_server = StartServer.DONT_START)
+                                  start_server=StartServer.DONT_START)
 
         # define basic base_config and desired processing pipeline
         self.base_config = {
             'timeout': 500000,
-            'annotators': 'tokenize,ssplit,pos,lemma,parse,ner,depparse,mention,coref',
+            'annotators': 'tokenize,ssplit,pos,lemma,parse,ner,depparse,coref',
             'tokenize.language': 'English',
-            # 'coref.algorithm' :'neural', see https://github.com/smilli/py-corenlp/issues/18
-            # CoreNLPs charniak-wrapper has some problems ...
-            # 'parse.type': 'charniak',
-            # 'parse.executable': '/home/ubuntu/bllip-parser/',
-            # 'parse.verbose': 'true',
-            # 'parse.model': './parse-50best.sh',#'~/.local/share/bllipparser/WSJ+Gigaword-v2',
             'outputFormat': 'json'
         }
 
@@ -109,7 +103,7 @@ class Preprocessor:
         """
         actual_config = self._build_actual_config(document)
         annotation = self.cnlp.annotate(text=document.get_full_text(),
-                                        properties = actual_config)
+                                        properties=actual_config)
 
         if type(annotation) is str:
             print(annotation)
