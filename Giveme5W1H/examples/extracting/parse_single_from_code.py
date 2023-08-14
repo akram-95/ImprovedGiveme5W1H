@@ -2,7 +2,7 @@ import logging
 
 from Giveme5W1H.extractor.document import Document
 from Giveme5W1H.extractor.extractor import MasterExtractor
-from Giveme5W1H.extractor.named_entity_recognition import NamedEntityRecognition
+from Giveme5W1H.extractor.extractors.named_entity_recognition_extractor import NamedEntityRecognitionExtractor
 
 """
 This is a simple example how to use the extractor in combination with a dict in news-please format.
@@ -14,7 +14,7 @@ This is a simple example how to use the extractor in combination with a dict in 
 # don`t forget to start up core_nlp_host
 # giveme5w1h-corenlp
 
-titleshort = "Barack Obama was born in Hawaii.  He is the president. Obama was elected in 2008."
+titleshort = "Barack Obama was born in Hawaii.  He is the president. Obama was elected in 2008 in Florida"
 
 title = "Taliban attacks German consulate in northern Afghan city of Mazar-i-Sharif with truck bomb"
 lead = "The death toll from a powerful Taliban truck bombing at the German consulate in Afghanistan's Mazar-i-Sharif city rose to at least six Friday, with more than 100 others wounded in a major militant assault."
@@ -76,10 +76,13 @@ if __name__ == '__main__':
 
     # giveme5w setup - with defaults
     extractor = MasterExtractor()
+
     doc = Document.from_text(titleshort, date_publish)
 
     doc = extractor.parse(doc)
-    print(extractor.namedEntityRecognition.getLocation_raw())
+    location_pattern = '[{ner:"CITY"} | {ner:"STATE_OR_PROVINCE"} | {ner:"LOCATION"} | {ner:"COUNTRY"}]+'
+    named_entity_recognition_extractor = next(
+        x for x in extractor.extractors if isinstance(x, NamedEntityRecognitionExtractor))
 
     top_who_answer = doc.get_top_answer('who').get_parts_as_text()
     top_what_answer = doc.get_top_answer('what').get_parts_as_text()
@@ -87,6 +90,7 @@ if __name__ == '__main__':
     top_where_answer = doc.get_top_answer('where').get_parts_as_text()
     top_why_answer = doc.get_top_answer('why').get_parts_as_text()
     top_how_answer = doc.get_top_answer('how').get_parts_as_text()
+    top_location_answer = doc.get_top_answers('location')
 
     print(top_who_answer)
     print(top_what_answer)
@@ -94,3 +98,5 @@ if __name__ == '__main__':
     print(top_where_answer)
     print(top_why_answer)
     print(top_how_answer)
+    print(top_location_answer)
+    print(named_entity_recognition_extractor.getNERByPattern_raw(doc, location_pattern))

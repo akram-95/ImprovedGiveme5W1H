@@ -5,7 +5,7 @@ from threading import Thread
 from Giveme5W1H.extractor.combined_scoring import distance_of_candidate
 from Giveme5W1H.extractor.extractors import action_extractor, environment_extractor, cause_extractor, method_extractor
 from Giveme5W1H.extractor.preprocessors.preprocessor_core_nlp import Preprocessor
-from Giveme5W1H.extractor.named_entity_recognition import NamedEntityRecognition
+from Giveme5W1H.extractor.extractors.named_entity_recognition_extractor import NamedEntityRecognitionExtractor
 
 
 class Worker(Thread):
@@ -31,7 +31,7 @@ class MasterExtractor:
     preprocessor = None
     extractors = []
     combinedScorers = None
-    namedEntityRecognition: NamedEntityRecognition = None
+    named_entity_recognition = None
 
     def __init__(self, preprocessor=None, extractors=None, combined_scorers=None, enhancement=None):
         """
@@ -48,10 +48,10 @@ class MasterExtractor:
 
         if preprocessor:
             self.preprocessor = preprocessor
-            self.namedEntityRecognition = NamedEntityRecognition(self.preprocessor.cnlp)
+            named_entity_recognition = NamedEntityRecognitionExtractor(self.preprocessor.cnlp)
         else:
             self.preprocessor = Preprocessor('http://localhost:9000')
-            self.namedEntityRecognition = NamedEntityRecognition(self.preprocessor.cnlp)
+            named_entity_recognition = NamedEntityRecognitionExtractor(self.preprocessor.cnlp)
 
         # initialize extractors
         if extractors is not None and len(extractors) > 0:
@@ -63,7 +63,8 @@ class MasterExtractor:
                 action_extractor.ActionExtractor(),
                 environment_extractor.EnvironmentExtractor(),
                 cause_extractor.CauseExtractor(),
-                method_extractor.MethodExtractor()
+                method_extractor.MethodExtractor(),
+                named_entity_recognition
             ]
 
         if combined_scorers is not None:
@@ -104,7 +105,7 @@ class MasterExtractor:
 
         :return: the processed document
         """
-        self.namedEntityRecognition.setDocument(doc)
+        # self.namedEntityRecognition.setDocument(doc)
         # preprocess -> coreNLP and enhancer
         self.preprocess(doc)
 

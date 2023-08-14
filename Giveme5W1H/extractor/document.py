@@ -154,6 +154,9 @@ class Document(object):
         result = self.get_answers(question=question)
         return Candidate() if len(result) == 0 else result[0]
 
+    def get_top_answers(self, question):
+        return self.get_answers(question=question)
+
     def get_annotations(self):
         return self._annotations
 
